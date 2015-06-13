@@ -1,23 +1,44 @@
 import unittest, os, sys, time
 sys.path.append(os.path.abspath('.'))
 
-from asynchat_poller import AsynchatPoller
-from src.echo_server import EchoServer
-from ws4py.client import WebSocketBaseClient
+from asynchat_poller             import AsynchatPoller
+from ws4py.client.threadedclient import WebSocketClient
+from ws4py                       import format_addresses
+from dummy_server                import DummyServer
 
+hello_utf8   = "Hello"
+hello_binary = b"\x00HelloBinary"
 
-class EchoClient(WebSocketBaseClient):
-    def handshake_ok(self):
-        print("Opening %s" % format_addresses(self))
-        m.add(self)
+class DummyClient(WebSocketClient):
+    def __init__(self, url):
+        WebSocketClient.__init__(self, url)
+        self.num_messages      = 2
+        self.messages_received = []
 
-    def received_message(self, msg):
-        print(str(msg))
+    def opened(self):
+
+        self.send(hello_utf8)
+        self.send(hello_binary, True)
+
+    # def closed(self, code, reason=None):
+    #     print("Closed down", code, reason)
+
+    def received_message(self, m):
+
+        if m.is_text:
+            self.messages_received.append(str(m))
+
+        if m.is_binary:
+            self.messages_received.append(m.data)
+
+        if self.num_messages == len(self.messages_received):
+            self.close()
+
 
 class TestConnection(unittest.TestCase):
 
     def setUp(self):
-        self.server = EchoServer('127.0.0.1', 3000)
+        self.server = DummyServer('127.0.0.1', 3000)
         self.async_poller = AsynchatPoller()
         self.async_poller.start()
 
@@ -27,11 +48,15 @@ class TestConnection(unittest.TestCase):
 
     def test_connection(self):
 
-        client = EchoClient('ws://127.0.0.1:3000/ws')
-        client.connect()
+        client = DummyClient('ws://127.0.0.1:3000/')
 
+        client.connect()
+        time.sleep(.1)
+
+        self.assertEqual(client.messages_received[0], hello_utf8)
+        self.assertEqual(client.messages_received[1], hello_binary)
+        
         client.close()
-        pass
 
 if __name__ == '__main__':
     unittest.main()
