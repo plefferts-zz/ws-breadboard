@@ -1,8 +1,11 @@
 from setuptools import setup
 
-APP = ['py-ws-server/app.py']
+APP = ['pywsserver/app.py']
 DATA_FILES = []
-OPTIONS = {'argv_emulation': True}
+OPTIONS = {
+    'argv_emulation': False,
+    'iconfile':'icon.icns'
+}
 
 setup(
     name='pywsserver',

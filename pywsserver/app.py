@@ -1,4 +1,5 @@
-import sys, asyncore
+import configparser, os
+import sys, sysconfig, asyncore, logging
 
 from tkinter import *
 import threading
@@ -41,6 +42,33 @@ class App(Frame):
 
         self.label.set("Loading...")
 
+configFile = 'pywsserver.cfg'
+logFile    = 'pywsserver.log'
+
+# OS X
+if sysconfig.get_config_vars()['base'].endswith('Contents/Resources'):
+    logFile    = '../../../' + logFile
+    configFile = '../../../' + configFile
+
+config = configparser.ConfigParser()
+
+if not os.path.isfile(configFile):
+    file = open(configFile, 'w')
+    file.write("[server]\nloglevel=critical")
+    file.close()
+
+config.read(configFile)
+
+logLevel = {
+    'debug'    : logging.DEBUG,
+    'info'     : logging.INFO,
+    'warning'  : logging.WARNING,
+    'error'    : logging.ERROR,
+    'critical' : logging.CRITICAL
+}[config.get('server', 'loglevel')]
+
+logging.basicConfig(filename=logFile, filemode='a', level=logLevel)
+
 root = Tk()
 root.title("PyWsServer")
 root.resizable(width=FALSE, height=FALSE)
@@ -52,7 +80,9 @@ app = App(root)
 class ServerThread(threading.Thread):
     def __init__(self):
         super().__init__()
+        logging.info('Starting server')
         self.server = Server('127.0.0.1', 3000)
+        logging.info('Server started')
 
     def stop(self):
         app.label.set("The server is shutting down...")
@@ -61,12 +91,15 @@ class ServerThread(threading.Thread):
 
     def run(self):
         app.label.set("The server is running.")
+        logging.info('Listening...')
         asyncore.loop()
 
 server_thread = ServerThread()
 server_thread.start()
 
+logging.info('Starting window')
 root.mainloop()
+logging.info('Window closed')
 server_thread.stop()
 server_thread.join()
 sys.exit()
