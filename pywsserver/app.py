@@ -72,6 +72,8 @@ logLevel = {
 
 logging.basicConfig(filename=logFile, filemode='a', level=logLevel)
 
+plugins = [os.path.splitext(path)[0] for path in os.listdir(pluginPath) if os.path.splitext(path)[1] == '.py']
+
 root = Tk()
 root.title("PyWsServer")
 root.resizable(width=FALSE, height=FALSE)
@@ -85,7 +87,6 @@ class ServerThread(threading.Thread):
         super().__init__()
         logging.info('Starting server')
         self.server = Server('127.0.0.1', 3000)
-        plugins = ['echo']
         for plugin in plugins:
             logging.info('Loading plugin:' + plugin)
             imp.load_source(plugin, os.path.join(pluginPath, plugin) + '.py').main(self.server)
