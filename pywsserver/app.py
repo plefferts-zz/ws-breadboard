@@ -1,8 +1,9 @@
-import sys
+import sys, asyncore
 
 from tkinter import *
 import threading
 from time import sleep
+from server import Server
 
 class App(Frame):
     def __init__(self, master):
@@ -16,7 +17,8 @@ class App(Frame):
         w.grid(row=0, column=0)
 
         def quit():
-            app_thread.stop()
+            server_thread.stop()
+            server_thread.join()
             root.quit()
 
         def eventQuit(event):
@@ -50,26 +52,21 @@ app = App(root)
 class ServerThread(threading.Thread):
     def __init__(self):
         super().__init__()
-        self._stop_event = threading.Event()
+        self.server = Server('127.0.0.1', 3000)
 
     def stop(self):
-        self._stop_event.set()
         app.label.set("The server is shutting down...")
-
-    def stopped(self):
-        return self._stop_event.isSet()
+        self.server.close()
+        self.join()
 
     def run(self):
         app.label.set("The server is running.")
-        while not self.stopped():
-            sleep(1)
-            print("Hi")
+        asyncore.loop()
 
-app_thread = ServerThread()
-app_thread.start()
-
+server_thread = ServerThread()
+server_thread.start()
 
 root.mainloop()
-print("MAIN")
-app_thread.stop()
+server_thread.stop()
+server_thread.join()
 sys.exit()
