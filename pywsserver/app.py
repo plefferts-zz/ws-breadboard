@@ -1,5 +1,5 @@
 import configparser, os
-import sys, sysconfig, asyncore, logging
+import sys, sysconfig, asyncore, logging, imp
 
 from tkinter import *
 import threading
@@ -44,11 +44,14 @@ class App(Frame):
 
 configFile = 'pywsserver.cfg'
 logFile    = 'pywsserver.log'
+pluginPath = 'plugins'
 
 # OS X
 if sysconfig.get_config_vars()['base'].endswith('Contents/Resources'):
-    logFile    = '../../../' + logFile
-    configFile = '../../../' + configFile
+    relative   = os.path.join('..', '..', '..')
+    logFile    = os.path.join(relative, logFile)
+    configFile = os.path.join(relative, configFile)
+    pluginPath = os.path.join(relative, pluginPath)
 
 config = configparser.ConfigParser()
 
@@ -82,6 +85,10 @@ class ServerThread(threading.Thread):
         super().__init__()
         logging.info('Starting server')
         self.server = Server('127.0.0.1', 3000)
+        plugins = ['echo']
+        for plugin in plugins:
+            logging.info('Loading plugin:' + plugin)
+            imp.load_source(plugin, os.path.join(pluginPath, plugin) + '.py').main(self.server)
         logging.info('Server started')
 
     def stop(self):
