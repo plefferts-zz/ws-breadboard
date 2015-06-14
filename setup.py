@@ -8,7 +8,7 @@ OPTIONS = {
 }
 
 setup(
-    name='pywsserver',
+    name='Python Websocket Server',
     version='0.0.1',
     description="A simple extendable python3 server to host websocket connections.",
     author="Peter Lefferts",
