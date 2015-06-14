@@ -1,5 +1,8 @@
 from setuptools import setup
-import os, re
+
+APP = ['py-ws-server/app.py']
+DATA_FILES = []
+OPTIONS = {'argv_emulation': True}
 
 setup(
     name='py-ws-server',
@@ -13,5 +16,9 @@ setup(
     packages=['py-ws-server'],
     platforms=['Any'],
     tests_require=['ws4py'],
-    test_suite="tests"
+    test_suite="tests",
+    app=APP,
+    data_files=DATA_FILES,
+    options={'py2app': OPTIONS},
+    setup_requires=['py2app']
 )
