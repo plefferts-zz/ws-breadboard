@@ -2,19 +2,21 @@
 
 A simple extendable websocket listener to get you started building multiplayer HTML5 browser games.
 
+- Light-weight, super simple
+- Great for experiments, side-projects, learning to code.
+
 > Check out the [example games](https://github.com/plefferts/ws-breadboard-examples).
 
-###Great for experiments, side-projects, learning to code.
+###What you do
+- Code your front-end in HTML5 and javascript
+- Build the back-end from pre-written plugins, or code your own (in python)
+- Start coding right away
+- Write your complex MMO back-end later
 
-- code your front-end in HTML5 and javascript
-- build the back-end from pre-written plugins, or code your own (in python)
-- distribute your game as a `.exe` or `.app` (for Windows or Mac)
-- players host their own server (like minecraft's `Open to LAN`)
-
-###Light-weight, super simple
-- start coding right away
-- no server bills
-- write your complex MMO back-end later
+###What you get
+- Ability to distribute your beta multiplayer game as a `.exe` or `.app` (for Windows or Mac)
+- Players host their own servers (like minecraft's `Open to LAN`)
+- No server bills
 
 ##How it works
 1. Download and run the server app to host a LAN game.
