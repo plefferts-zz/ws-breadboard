@@ -1,5 +1,6 @@
 __pycache__
 build/
 dist/
-pywsserver.log
-pywsserver.cfg
+*.log
+*.cfg
+.eggs

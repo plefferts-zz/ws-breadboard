@@ -1,15 +1,17 @@
 import configparser, os, traceback
 import sys, sysconfig, asyncore, logging, imp
 import http.server, socketserver
+import webbrowser
 
 from tkinter import *
+import tkinter.font
 import threading
 from time import sleep
 from server import Server
 
 
-configFile = 'pywsserver.cfg'
-logFile    = 'pywsserver.log'
+configFile = 'ws-breadboard.cfg'
+logFile    = 'ws-breadboard.log'
 pluginPath = 'plugins'
 publicPath = 'public'
 
@@ -123,11 +125,14 @@ def stop_servers():
     webserver_thread.stop()
 
 root = Tk()
-root.title("PyWsServer")
+root.title("Websocket Breadboard")
 root.resizable(width=FALSE, height=FALSE)
 root.geometry('{}x{}'.format(400, 150))
 root.grid_columnconfigure(0, weight=1)
-root.grid_rowconfigure(0, weight=1)
+root.grid_rowconfigure(0, weight=4)
+root.grid_rowconfigure(1, weight=1)
+root.grid_rowconfigure(2, weight=1)
+root.grid_rowconfigure(3, weight=4)
 
 class App(Frame):
     def __init__(self, master):
@@ -137,8 +142,40 @@ class App(Frame):
         self.widgets(master)
 
     def widgets(self, root):
+
+        href = r"http://127.0.0.1:17080"
+
         w = Label(root, textvariable=self.label)
-        w.grid(row=0, column=0)
+        w.grid(row=1, column=0)
+
+        #windows: hand2
+        link = Label(root, text="Launch App", fg="#00B", cursor="pointinghand")
+        
+        f = tkinter.font.Font(link, link.cget("font"))
+        f.configure(underline = True)
+        link.configure(font=f)
+        
+        link.grid(row=2, column=0)
+
+        def copy():
+            root.clipboard_clear()
+            root.clipboard_append(href)
+
+        # create a popup menu
+        popupmenu = Menu(root, tearoff=0)
+        popupmenu.add_command(label="Copy Link Address", command=copy)
+
+        def popup(event):
+            popupmenu.post(event.x_root, event.y_root)
+
+        def callback(event):
+            if event.state & 4:
+                popup(event)
+            else:
+                webbrowser.open_new(href)
+        
+        link.bind("<Button-2>", popup)
+        link.bind("<Button-1>", callback)
 
         # create a toplevel menu
         menubar = Menu(root)

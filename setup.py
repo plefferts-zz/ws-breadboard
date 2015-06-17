@@ -1,22 +1,22 @@
 from setuptools import setup
 
-APP = ['pywsserver/app.py']
+APP = ['wsbreadboard/app.py']
 DATA_FILES = []
 OPTIONS = {
     'argv_emulation': False,
-    'iconfile':'icon.icns'
+    'iconfile':'ws-breadboard.icns'
 }
 
 setup(
-    name='Python Websocket Server',
+    name='Websocket Breadboard',
     version='0.0.1',
     description="A simple extendable python3 server to host websocket connections.",
     author="Peter Lefferts",
     author_email="peterlefferts@gmail.com",
     install_requires=[],
-    url='http://github.com/plefferts/py-ws-server',
+    url='http://github.com/plefferts/ws-breadboard',
     license="MIT",
-    packages=['pywsserver'],
+    packages=['wsbreadboard'],
     platforms=['Any'],
     tests_require=['ws4py'],
     test_suite="tests",
