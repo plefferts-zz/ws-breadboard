@@ -1,4 +1,4 @@
-import socket, asyncore, asynchat, json, logging
+import socket, asyncore, asynchat, json, logging, sys, traceback
 from websocket import WebSocketConnection
 
 class PubSub(list):
@@ -7,8 +7,10 @@ class PubSub(list):
             try:
                 f(*args, **kwargs)
             except:
-                e = sys.exc_info()[0]
-                print(e)
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                logging.error(exc_type)
+                logging.error("line: " + str(exc_traceback.tb_lineno))
+                logging.error("".join(traceback.format_tb(exc_traceback)))
 
     def __repr__(self):
         return "PubSub(%s)" % list.__repr__(self)
@@ -59,10 +61,19 @@ class Connection(WebSocketConnection, HasEvents):
         self.event('handshake_complete')()
     
     def handle_utf8_message(self, data):
-        data       = str(data, encoding='utf8')
-        event      = json.loads(data)
-        event_name = event['_event']
-        if event_name in self.event:
-            self.events[event_name](message)
+        try:
+            data       = str(data, encoding='utf8')
+            event      = json.loads(data)
+            event_name = event['_event']
+            if event_name in self.events:
+                self.events[event_name](event)
+        except:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            logging.error(exc_type)
+            logging.error("line: " + str(exc_traceback.tb_lineno))
+            logging.error("".join(traceback.format_tb(exc_traceback)))
 
+    def send_json(self, val):
+        msg = json.dumps(val)
+        self.send_utf8_message(bytes(msg, encoding='utf8'))
 
