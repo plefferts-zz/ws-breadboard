@@ -55,6 +55,7 @@ class Connection(WebSocketConnection, HasEvents):
         WebSocketConnection.__init__(self, sock, addr)
         HasEvents.__init__(self)
         self.server = server
+        self.is_closed = False
 
     def handshake_complete(self):
         WebSocketConnection.handshake_complete(self)
@@ -72,6 +73,13 @@ class Connection(WebSocketConnection, HasEvents):
             logging.error(exc_type)
             logging.error("line: " + str(exc_traceback.tb_lineno))
             logging.error("".join(traceback.format_tb(exc_traceback)))
+
+    def close(self):
+        WebSocketConnection.close(self)
+        logging.info('closed ' + str(self.addr))
+        if not self.is_closed:
+            self.event('connection_closed')(self)
+            self.is_closed = True
 
     def send_json(self, val):
         msg = json.dumps(val)

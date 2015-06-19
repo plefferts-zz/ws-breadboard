@@ -1,6 +1,7 @@
 import queue
 import configparser, os, traceback
 import sys, sysconfig, asyncore, logging, imp
+import socket
 import webbrowser
 
 from tkinter import *
@@ -124,6 +125,13 @@ os.chdir(publicPath)
 webserver_thread = WebServerThread()
 webserver_thread.start()
 
+def host():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
+
 def userIterface():
 
     root = Tk()
@@ -140,7 +148,7 @@ def userIterface():
 
     label = StringVar()
 
-    href = r"http://127.0.0.1:17080"
+    href = "http://" + host() + ":" + str(config.getint('server', 'port'))
 
     w = Label(root, textvariable=label)
     w.grid(row=1, column=0)
