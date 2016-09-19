@@ -37,3 +37,7 @@ A simple extendable websocket listener to get you started building multiplayer H
 #Writing Plugins
 coming soon
 
+#Contributing
+
+##Build
+    python3 setup.py py2app

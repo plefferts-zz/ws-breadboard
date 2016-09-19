@@ -65,6 +65,8 @@ class WebsocketServerThread(threading.Thread):
         super().__init__()
         logging.info('Starting Websocket Server')
         self.server = Server('', config.getint('server', 'websocketport'))
+
+        sys.path.append(os.path.abspath(pluginPath))
         for plugin in plugins:
             logging.info('Loading plugin:' + plugin)
             imp.load_source(plugin, os.path.join(pluginPath, plugin) + '.py').main(self.server)
