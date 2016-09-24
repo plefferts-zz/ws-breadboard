@@ -48,7 +48,7 @@ logLevel = {
     'critical' : logging.CRITICAL
 }[config.get('server', 'loglevel')]
 
-logging.basicConfig(filename=logFile, filemode='a', level=logLevel)
+logging.basicConfig(filename=logFile, filemode='a', level=logLevel, format='%(levelname)s: %(message)s')
 
 if not os.path.exists(pluginPath):
     os.makedirs(pluginPath)

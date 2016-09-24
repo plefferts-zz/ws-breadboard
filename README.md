@@ -39,5 +39,7 @@ coming soon
 
 #Contributing
 
+## Run
+    python3 wsbreadboard/app.py
 ##Build
     python3 setup.py py2app

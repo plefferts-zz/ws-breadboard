@@ -8,9 +8,10 @@ class PubSub(list):
                 f(*args, **kwargs)
             except:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
-                logging.error(exc_type)
-                logging.error("line: " + str(exc_traceback.tb_lineno))
-                logging.error("".join(traceback.format_tb(exc_traceback)))
+                logging.error("Exception during event handler:")
+                for string in iter(list(reversed(traceback.format_tb(exc_traceback)))):
+                    logging.error(string.rstrip())
+                logging.error(repr(exc_value))
 
     def __repr__(self):
         return "PubSub(%s)" % list.__repr__(self)
@@ -23,7 +24,7 @@ class HasEvents:
         if name not in self.events:
             self.events[name] = PubSub()
         return self.events[name]
-    
+
     def on(self, name, listener):
         self.event(name).append(listener)
 
@@ -47,7 +48,7 @@ class Server(asyncore.dispatcher, HasEvents):
         def cb():
             handler.off('handshake_complete', cb)
             self.event('connection')(handler)
-        
+
         handler.on('handshake_complete', cb)
 
 class Connection(WebSocketConnection, HasEvents):
@@ -60,7 +61,7 @@ class Connection(WebSocketConnection, HasEvents):
     def handshake_complete(self):
         WebSocketConnection.handshake_complete(self)
         self.event('handshake_complete')()
-    
+
     def handle_utf8_message(self, data):
         try:
             data       = str(data, encoding='utf8')
@@ -70,9 +71,10 @@ class Connection(WebSocketConnection, HasEvents):
                 self.events[event_name](event)
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            logging.error(exc_type)
-            logging.error("line: " + str(exc_traceback.tb_lineno))
-            logging.error("".join(traceback.format_tb(exc_traceback)))
+            logging.error("Exception during event handler:")
+            for string in iter(list(reversed(traceback.format_tb(exc_traceback)))):
+                logging.error(string.rstrip())
+            logging.error(repr(exc_value))
 
     def close(self):
         WebSocketConnection.close(self)
